@@ -1,0 +1,2 @@
+global.message = "";
+global.arrays = {};
