@@ -1,2 +1,2 @@
 global.message = "";
-global.arrays = {};
+global.arrays = [];
