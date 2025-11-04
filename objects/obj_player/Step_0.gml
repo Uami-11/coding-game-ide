@@ -83,10 +83,27 @@ if (global.started) {
             }
         }
     }
+	// When execution finishes
+	if (global.started && current_line >= ds_list_size(global.exec_lines) && !command_active) {
+	    if (global.CheeseCoutner != global.cheese) {
+			
+	        show_debug_message("try to collect all the cheese!");
 
-    // If we've reached the end, stop
-    if (current_line >= ds_list_size(global.exec_lines)) {
-        global.started = false;
-        current_line = 0;
-    }
+	        // reset player position
+	        x = start_x;
+	        y = start_y;
+	        image_angle = start_angle;
+
+	        // reset control vars
+	        current_line = 0;
+	        command_active = false;
+	        cmd_type = "";
+	        cmd_target = 0;
+	        cmd_progress = 0;
+
+	        global.started = false;
+	    }
+	}
 }
+
+

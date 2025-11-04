@@ -1,5 +1,5 @@
 if (global.started) {
-    global.CheeseCounter = 0;
+    
 
     // Step 1: Expand any for-loops into explicit commands
     var expanded_lines = ds_list_create();
@@ -72,53 +72,58 @@ if (global.started) {
         }
     }
 
-    // Step 2: Process expanded lines normally
-    for (var i = 0; i < ds_list_size(expanded_lines); i++) {
-        var line = expanded_lines[| i];
-        var words = string_split_ext(string_trim(line), [" "], true);
+	// Step 2: Process expanded lines normally
+	for (var i = 0; i < ds_list_size(expanded_lines); i++) {
+	    var line = expanded_lines[| i];
+	    var words = string_split_ext(string_trim(line), [" "], true);
 
-        if (array_length(words) == 2) {
-            var cmd = string_lower(words[0]);
-            var val = string_trim(words[1]);
+	    if (array_length(words) == 2) {
+	        var cmd = string_lower(words[0]);
+	        var val = string_trim(words[1]);
 
-            try {
-                var num = real(val);
+	        try {
+	            var num = real(val); // try converting
 
-                if (cmd == "step") {
-                    Stepped(num);
-                }
-                else if (cmd == "turn") {
-                    Turned(num);
-                }
-                else {
-                    global.started = false;
-                    break;
-                }
-            }
-            catch (e) {
-                global.started = false;
-                break;
-            }
-        }
-        else {
-            global.started = false;
-            break;
-        }
-			show_debug_message(expanded_lines)
-			for (var i = 0; i < ds_list_size(expanded_lines); i += 1)
-				{
-				    var value = ds_list_find_value(expanded_lines, i); // Get the value at the current index
-				    // Alternatively, in newer GMS versions, you can use the accessor:
-				    // var value = my_list[| i]; 
-				    show_debug_message("List item at index " + string(i) + ": " + string(value));
-				}
-    }
-
-    // clean up
-	// instead of destroying editor_lines, create a new exec_lines list
-	if (ds_exists(global.exec_lines, ds_type_list)) {
-	    ds_list_destroy(global.exec_lines);
+	            if (cmd == "step") {
+	                Stepped(num);
+	            }
+	            else if (cmd == "turn") {
+	                Turned(num);
+	            }
+	            else {
+	                // unrecognized command keyword
+	                show_debug_message("don't recognize command '" + cmd + "' at line " + string(i + 1));
+	                global.started = false;
+	                break;
+	            }
+	        }
+	        catch (e) {
+	            // real() conversion failed, meaning val is invalid (e.g., 34e, abc, etc.)
+	            show_debug_message("don't recognize value '" + val + "' at line " + string(i + 1));
+	            global.started = false;
+	            break;
+	        }
+	    }
+	    else {
+	        // not exactly two parts -> malformed command
+	        show_debug_message("invalid syntax at line " + string(i + 1) + ": '" + line + "'");
+	        global.started = false;
+	        break;
+	    }
 	}
-	global.exec_lines = expanded_lines;
+	
+	// Step 3: Finalize and store the executable list
+	if (global.started) {
+	    // only replace exec_lines if parsing succeeded
+	    if (ds_exists(global.exec_lines, ds_type_list)) {
+	        ds_list_destroy(global.exec_lines);
+	    }
+	    global.exec_lines = expanded_lines;
+	} else {
+	    // if parsing failed, cleanup and stop
+	    if (ds_exists(expanded_lines, ds_type_list)) ds_list_destroy(expanded_lines);
+	}
+
 
 }
+ if (!global.started) global.CheeseCoutner = 0;
