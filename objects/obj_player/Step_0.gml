@@ -17,8 +17,8 @@ if (global.started && current_line == 0 && !command_active) {
 if (global.started) {
 
     // If no command is active, fetch the next one
-    if (!command_active && current_line < ds_list_size(global.editor_lines)) {
-        var line = global.editor_lines[| current_line];
+    if (!command_active && current_line < ds_list_size(global.exec_lines)) {
+        var line = global.exec_lines[| current_line];
         var words = string_split_ext(string_trim(line), [" "], true);
 
         if (array_length(words) == 2) {
@@ -85,7 +85,7 @@ if (global.started) {
     }
 
     // If we've reached the end, stop
-    if (current_line >= ds_list_size(global.editor_lines)) {
+    if (current_line >= ds_list_size(global.exec_lines)) {
         global.started = false;
         current_line = 0;
     }
